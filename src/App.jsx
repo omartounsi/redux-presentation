@@ -19,9 +19,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 function App() {
   const [welcomeVisible, setWelcomeVisible] = useState(true);
-
   const [mainVisible, setMainVisible] = useState(false);
   const [bgColor, setBgColor] = useState("bg-neutral-900");
+  const [gridVisible, setGridVisible] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,9 +39,15 @@ function App() {
   return (
     <>
       <div
-        className={`${bgColor} min-h-screen w-full grid place-content-center transition-colors`}
+        className={`${bgColor} min-h-screen w-full grid place-content-center transition-colors relative z-1 overflow-hidden`}
       >
         <LayoutGroup>
+          {gridVisible && (
+            <InteractiveOverlay
+              key={location.pathname} // Unique key for re-rendering
+            />
+          )}
+
           <AnimatePresence mode="sync">
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<Welcome />} />
@@ -49,10 +55,23 @@ function App() {
                 path="/title"
                 element={<Title setBgColor={setBgColor} />}
               />
-              <Route path="/content" element={<Content />} />
+              <Route
+                path="/content"
+                element={
+                  <Content
+                    setGridVisible={setGridVisible}
+                    setBgColor={setBgColor}
+                  />
+                }
+              />
               <Route
                 path="/example"
-                element={<Example setBgColor={setBgColor} />}
+                element={
+                  <Example
+                    setBgColor={setBgColor}
+                    setGridVisible={setGridVisible}
+                  />
+                }
               />
             </Routes>
           </AnimatePresence>
@@ -287,13 +306,20 @@ const Title = ({ setBgColor }) => {
   );
 };
 
-const Content = () => {
+const Content = ({ setGridVisible, setBgColor }) => {
   const { scrollYProgress } = useScroll();
   const navigate = useNavigate();
+  const isOpen = useSelector((state) => state.theme.theme);
+  const dispatch = useDispatch();
 
   // useMotionValueEvent(scrollYProgress, "change", (latest) => {
   //   console.log(latest);
   // });
+
+  useEffect(() => {
+    setGridVisible(true);
+    console.log(isOpen);
+  }, []);
 
   return (
     <motion.div
@@ -314,7 +340,7 @@ const Content = () => {
       }}
       initial="hidden"
       animate="visible"
-      className="flex"
+      className="flex z-4 relative"
     >
       <motion.div
         style={{
@@ -322,7 +348,15 @@ const Content = () => {
         }}
         className="fixed top-0 w-1  bg-neutral-700 h-screen origin-top"
       ></motion.div>
-      <motion.div className="text-neutral-800 font-[Quicksand] text-lg h-[310vh] w-160 p-18 bg-violet-100 shadow-xl flex flex-col mt-24 gap-2">
+      <motion.div
+        className={`${
+          isOpen ? "text-neutral-100" : "text-neutral-800"
+        } font-[Quicksand] text-lg h-[300] w-160 p-18 ${
+          isOpen ? "bg-neutral-800/40" : "bg-neutral-100"
+        }  ${
+          isOpen ? "shadow-neutral-400/40 shadow-sm" : "shadow-xl"
+        } flex flex-col mt-24 gap-2 transition-colors `}
+      >
         {/* logo */}
         <motion.div className="flex flex-col justify-center items-center w-auto h-auto gap-8">
           <motion.svg
@@ -636,7 +670,6 @@ const Content = () => {
               opacity: 0.6,
               y: 0,
               transition: {
-                delay: 4.8,
                 duration: 0.1,
               },
             },
@@ -685,11 +718,13 @@ const Content = () => {
   );
 };
 
-const Example = ({ setBgColor }) => {
+const Example = ({ setBgColor, setGridVisible }) => {
   const { scrollYProgress } = useScroll();
   const isOpen = useSelector((state) => state.theme.theme);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    setGridVisible(true);
     const lenis = new Lenis({
       autoRaf: true,
     });
@@ -698,23 +733,23 @@ const Example = ({ setBgColor }) => {
   }, []);
 
   return (
-    <div className="flex">
+    <div className="flex z-2">
       <motion.div
         style={{
           scaleY: scrollYProgress,
         }}
         className={`fixed top-0 w-1 ${
-          isOpen ? "bg-neutral-200" : "bg-neutral-600"
+          isOpen ? "bg-neutral-400/40" : "bg-neutral-500"
         } h-screen origin-top rounded-full`}
       ></motion.div>
       <div
         className={`${
           isOpen ? "text-neutral-100" : "text-neutral-800"
-        } font-[Quicksand] text-lg h-[450vh] w-160 p-18 ${
-          isOpen ? "bg-neutral-800/20" : "bg-violet-100"
+        } font-[Quicksand] text-lg h-[460vh] w-160 p-18 ${
+          isOpen ? "bg-neutral-800/40" : "bg-neutral-100"
         }  ${
           isOpen ? "shadow-neutral-400/40 shadow-sm" : "shadow-xl"
-        } flex flex-col mt-24 gap-2 transition-colors`}
+        } flex flex-col mt-24 gap-2 transition-colors `}
       >
         <motion.h1
           variants={{
@@ -880,6 +915,38 @@ const Example = ({ setBgColor }) => {
         </motion.h1>
 
         <Card setBgColor={setBgColor} />
+        <motion.button
+          whileHover={{
+            scale: 1.1,
+            opacity: 1,
+          }}
+          whileTap={{
+            scale: 0.95,
+          }}
+          variants={{
+            hidden: {
+              opacity: 0,
+              y: 40,
+            },
+            visible: {
+              opacity: 0.6,
+              y: 0,
+              transition: {
+                duration: 0.1,
+              },
+            },
+          }}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          onClick={() => {
+            navigate("/content");
+          }}
+          className="bg-[#5c339d] p-4 rounded-full text-neutral-200 font-[Quicksand] text-md flex items-center justify-center gap-1 cursor-pointer mt-8"
+        >
+          <IoIosArrowForward size={16} className="rotate-180" />
+          <span>Back</span>
+        </motion.button>
       </div>
     </div>
   );
@@ -916,7 +983,7 @@ const Card = ({ setBgColor }) => {
         <div
           onClick={setIsOpen}
           className={`w-50 h-20 ${
-            isOpen ? "bg-neutral-700" : "bg-violet-300"
+            isOpen ? "bg-neutral-700" : "bg-neutral-300"
           } rounded-full flex items-center px-1 ${
             isOpen ? "justify-end" : "justify-start"
           } pointer-cursor shadow-neutral-400/60 transition-colors`}
@@ -956,8 +1023,10 @@ const Reveal = ({ children, delay = 0.1 }) => {
           delay,
         }}
         className={`${
-          isOpen ? "bg-neutral-900" : "bg-neutral-200/80"
-        } p-2 transition-colors`}
+          isOpen ? "bg-neutral-900" : "bg-neutral-200/20"
+        } p-2 transition-transform hover:scale-105 border-1 ${
+          isOpen ? "border-neutral-900" : "border-neutral-200"
+        } `}
       >
         {children}
       </motion.div>
@@ -990,6 +1059,121 @@ const ScrollReveal = ({ text }) => {
             );
           })}
         </div>
+      </div>
+    </>
+  );
+};
+
+const GridOverlay = ({
+  color = "rgb(255, 255, 255, 0.8)",
+  spacing = 20,
+  lineWidth = 1,
+  zIndex = 0,
+  className = "",
+  enableVertical = true,
+  enableHorizontal = true,
+}) => {
+  const isOpen = useSelector((state) => state.theme.theme);
+
+  const gridStyle = {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    zIndex: zIndex,
+    backgroundImage: `
+      ${
+        enableVertical
+          ? `linear-gradient(to right, ${
+              isOpen ? "rgb(0, 0, 0, 0.2)" : "rgb(255, 255, 255, 0.8)"
+            } ${lineWidth}px, transparent ${lineWidth}px)`
+          : ""
+      }
+      ${enableVertical && enableHorizontal ? ", " : ""}
+      ${
+        enableHorizontal
+          ? `linear-gradient(to bottom, ${
+              isOpen ? "rgb(0, 0, 0, 0.2)" : "rgb(255, 255, 255, 0.8)"
+            } ${lineWidth}px, transparent ${lineWidth}px)`
+          : ""
+      }
+    `,
+    backgroundSize: `${spacing}px ${spacing}px`,
+    transition: "background-image 5s ease",
+  };
+
+  return <div className={className} style={gridStyle}></div>;
+};
+
+const InteractiveOverlay = ({
+  spacing = 80,
+  lineWidth = 1,
+  zIndex = 0,
+  className = "",
+}) => {
+  const isOpen = useSelector((state) => state.theme.theme);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    function updateDimensions() {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        setDimensions({ width, height });
+      }
+    }
+
+    updateDimensions();
+
+    window.addEventListener("resize", updateDimensions);
+    return () => window.removeEventListener("resize", updateDimensions);
+  }, []);
+
+  const columns = Math.ceil(dimensions.width / spacing) + 1;
+  const rows = Math.ceil(dimensions.height / spacing) + 1;
+  const totalSquares = columns * rows;
+
+  const gridSquares = [];
+  for (let i = 0; i < totalSquares; i++) {
+    gridSquares.push(i);
+  }
+  return (
+    <>
+      <div
+        ref={containerRef}
+        className={`absolute top-0 left-0 w-full h-full grid`}
+        style={{
+          zIndex: zIndex,
+          gridTemplateColumns: `repeat(${columns}, ${spacing}px)`,
+          gridTemplateRows: `repeat(${rows}, ${spacing}px)`,
+        }}
+      >
+        {gridSquares.map((div, i) => (
+          <div
+            key={i}
+            className={`transition-all duration-200`}
+            style={{
+              width: `${spacing - lineWidth}px`,
+              height: `${spacing - lineWidth}px`,
+              backgroundColor: isOpen
+                ? "rgba(0, 0, 0, 0.2)"
+                : "rgba(255, 255, 255, 0.8)",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = isOpen
+                ? "rgba(0, 0, 0, 0.4)"
+                : "rgba(200, 200, 200, 0.2)";
+              e.target.style.transform = "scale(1.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = isOpen
+                ? "rgba(0, 0, 0, 0.2)"
+                : "rgba(255, 255, 255, 0.8)";
+              e.target.style.transform = "scale(1)";
+            }}
+          ></div>
+        ))}
       </div>
     </>
   );
