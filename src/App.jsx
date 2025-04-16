@@ -351,7 +351,7 @@ const Content = ({ setGridVisible, setBgColor }) => {
       <motion.div
         className={`${
           isOpen ? "text-neutral-100" : "text-neutral-800"
-        } font-[Quicksand] text-lg h-[300] w-160 p-18 ${
+        } font-[Quicksand] text-lg h-[300] lg:w-160 sm:w-80 p-18 ${
           isOpen ? "bg-neutral-800/40" : "bg-neutral-100"
         }  ${
           isOpen ? "shadow-neutral-400/40 shadow-sm" : "shadow-xl"
@@ -538,14 +538,6 @@ const Content = ({ setGridVisible, setBgColor }) => {
             </li>
           </ul>
         </Reveal>
-        <Reveal delay={0.1}>
-          <ul className="list-disc list-inside">
-            <li>
-              Changes are Made with Pure Functions - These are called reducers
-              and they decide how the state updates.
-            </li>
-          </ul>
-        </Reveal>
 
         {/* flow */}
         <motion.h1
@@ -595,8 +587,8 @@ const Content = ({ setGridVisible, setBgColor }) => {
         <Reveal delay={0.1}>
           <ul className="list-disc list-inside">
             <li>
-              <bold>Store:</bold> The single source of truth that holds the
-              entire state tree of your application. It's created using the{" "}
+              <b>Store:</b> The single source of truth that holds the entire
+              state tree of your application. It's created using the{" "}
               <code className="text-red-500">createStore</code> function.
             </li>
           </ul>
@@ -605,7 +597,7 @@ const Content = ({ setGridVisible, setBgColor }) => {
         <Reveal delay={0.1}>
           <ul className="list-disc list-inside">
             <li>
-              <bold>Action:</bold> Plain JavaScript objects that represent "what
+              <b>Action:</b> Plain JavaScript objects that represent "what
               happened" in the app. They must have a type property and may
               include additional data.
             </li>
@@ -615,10 +607,10 @@ const Content = ({ setGridVisible, setBgColor }) => {
         <Reveal delay={0.1}>
           <ul className="list-disc list-inside">
             <li>
-              <bold>Reducer:</bold> Pure functions that specify how the
-              application's state changes in response to actions. Reducers take
-              the previous state and an action, and return the next state
-              without modifying the previous state.
+              <b>Reducer:</b> Pure functions that specify how the application's
+              state changes in response to actions. Reducers take the previous
+              state and an action, and return the next state without modifying
+              the previous state.
             </li>
           </ul>
         </Reveal>
@@ -626,8 +618,8 @@ const Content = ({ setGridVisible, setBgColor }) => {
         <Reveal delay={0.1}>
           <ul className="list-disc list-inside">
             <li>
-              <bold>Dispatch:</bold> The method used to send actions to the
-              store, triggering state changes.
+              <b>Dispatch:</b> The method used to send actions to the store,
+              triggering state changes.
             </li>
           </ul>
         </Reveal>
@@ -635,9 +627,9 @@ const Content = ({ setGridVisible, setBgColor }) => {
         <Reveal delay={0.1}>
           <ul className="list-disc list-inside">
             <li>
-              <bold>Selectors:</bold> Functions that extract specific pieces of
-              data from the store state, allowing components to get only the
-              data they need.
+              <b>Selectors:</b> Functions that extract specific pieces of data
+              from the store state, allowing components to get only the data
+              they need.
             </li>
           </ul>
         </Reveal>
@@ -645,7 +637,7 @@ const Content = ({ setGridVisible, setBgColor }) => {
         <Reveal delay={0.1}>
           <ul className="list-disc list-inside">
             <li>
-              <bold>Middleware:</bold> Extends Redux with custom functionality,
+              <b>Middleware:</b> Extends Redux with custom functionality,
               sitting between dispatching an action and the moment it reaches
               the reducer. Common uses include logging, crash reporting, async
               operations, and routing.
@@ -745,7 +737,7 @@ const Example = ({ setBgColor, setGridVisible }) => {
       <div
         className={`${
           isOpen ? "text-neutral-100" : "text-neutral-800"
-        } font-[Quicksand] text-lg h-[460vh] w-160 p-18 ${
+        } font-[Quicksand] text-lg h-[460vh] lg:w-160 sm:w-80 p-18 ${
           isOpen ? "bg-neutral-800/40" : "bg-neutral-100"
         }  ${
           isOpen ? "shadow-neutral-400/40 shadow-sm" : "shadow-xl"
@@ -793,8 +785,10 @@ const Example = ({ setBgColor, setGridVisible }) => {
         </Reveal>
         <Reveal>
           <li>Redux installation: </li>
-          <div className="bg-amber-200 w-full rounded-md px-2">
-            <code className="">npm install @reduxjs/toolkit react-redux</code>
+          <div className={`bg-amber-200 w-full rounded-md px-2 `}>
+            <code className={`${isOpen ? "text-neutral-800" : ""}`}>
+              npm install @reduxjs/toolkit react-redux
+            </code>
           </div>
         </Reveal>
         <Reveal>
