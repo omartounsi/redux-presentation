@@ -26,15 +26,34 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Initialize Lenis
-  const lenis = new Lenis({
-    autoRaf: true,
-  });
+  // Initialize Lenis with proper cleanup
+  useEffect(() => {
+    let lenis;
 
-  // Listen for the scroll event and log the event data
-  // lenis.on("scroll", (e) => {
-  //   console.log(e);
-  // });
+    try {
+      lenis = new Lenis({
+        autoRaf: true,
+        smoothWheel: true,
+        smoothTouch: false,
+      });
+
+      // Listen for the scroll event and log the event data
+      // lenis.on("scroll", (e) => {
+      //   console.log(e);
+      // });
+
+      console.log("Lenis initialized successfully");
+    } catch (error) {
+      console.error("Error initializing Lenis:", error);
+    }
+
+    return () => {
+      if (lenis) {
+        lenis.destroy();
+        console.log("Lenis destroyed");
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -317,9 +336,16 @@ const Content = ({ setGridVisible, setBgColor }) => {
   // });
 
   useEffect(() => {
-    setGridVisible(true);
-    console.log(isOpen);
-  }, []);
+    try {
+      setGridVisible(true);
+      console.log("Content component mounted, theme:", isOpen);
+
+      // Ensure smooth scrolling is working
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      console.error("Error in Content component useEffect:", error);
+    }
+  }, [setGridVisible, isOpen]);
 
   return (
     <motion.div
@@ -351,7 +377,7 @@ const Content = ({ setGridVisible, setBgColor }) => {
       <motion.div
         className={`${
           isOpen ? "text-neutral-100" : "text-neutral-800"
-        } font-[Quicksand] text-lg h-[300] lg:w-160 sm:w-80 p-18 ${
+        } font-[Quicksand] text-lg min-h-screen lg:w-160 sm:w-80 p-18 ${
           isOpen ? "bg-neutral-800/40" : "bg-neutral-100"
         }  ${
           isOpen ? "shadow-neutral-400/40 shadow-sm" : "shadow-xl"

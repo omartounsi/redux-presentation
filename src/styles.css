@@ -1,3 +1,22 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
 *::-webkit-scrollbar {
-    display: none;}
+  display: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body,
+html {
+  touch-action: manipulation;
+  -webkit-overflow-scrolling: touch;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  overflow-x: hidden;
+}
